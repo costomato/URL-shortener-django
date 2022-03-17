@@ -249,7 +249,7 @@
                     $(".loader-6").css("visibility", "hidden")
                     if (data['status']) {
                         $("#mainUrl").html(data['url'])
-                        $("#resUrl").html(`${window.location.href}${data['res']}`)
+                        $("#resUrl").html(`${(window.location.href).replace(/(^\w+:|^)\/\//, '')}${data['res']}`)
                         $("#result").css("display", "block")
                         toastAlert("Success!", "The short link has been generated.")
                     } else

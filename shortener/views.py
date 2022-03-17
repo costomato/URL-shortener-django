@@ -37,6 +37,10 @@ def shorten(request):
         )
 
     url = request.POST.get("url")
+
+    if "://" not in url:
+        url = "http://" + url
+
     validate = URLValidator()
     try:
         validate(url)
