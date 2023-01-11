@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import dj_database_url
-import django_on_heroku
+# import django_on_heroku
 import os
 
 
@@ -91,10 +91,11 @@ WSGI_APPLICATION = 'urlshortener.wsgi.application'
 # }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'db',
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'db',
+    # }
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'), conn_max_age=600),
 }
 
 db_from_env = dj_database_url.config(conn_max_age=500)
@@ -148,4 +149,4 @@ WHITENOISE_USE_FINDERS = True
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
-django_on_heroku.settings(locals())
+# django_on_heroku.settings(locals())
