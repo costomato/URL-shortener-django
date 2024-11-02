@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta tags -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta name="viewport" content="width=device-width" />
+    <!-- Favicon and title -->
+    {% load static %}
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+
+    <title>Shortly - URL shortener</title>
+
+    <!-- My CSS -->
+    <style>
+        .loader-6 {
+            height: 32px;
+            width: 32px;
+            visibility: hidden;
+        }
+
+        .loader-6 span {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+            height: 32px;
+            width: 32px;
+        }
+
+        .loader-6 span::before,
+        .loader-6 span::after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+            height: 32px;
+            width: 32px;
+            border: 2px solid #FFF;
+            border-radius: 50%;
+            opacity: 0;
+            -webkit-animation: loader-6-1 1.5s cubic-bezier(0.075, 0.820, 0.165, 1.000) infinite;
+            animation: loader-6-1 1.5s cubic-bezier(0.075, 0.820, 0.165, 1.000) infinite;
+        }
+
+        @-webkit-keyframes loader-6-1 {
+            0% {
+                -webkit-transform: translate3d(0, 0, 0) scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                -webkit-transform: translate3d(0, 0, 0) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes loader-6-1 {
+            0% {
+                transform: translate3d(0, 0, 0) scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate3d(0, 0, 0) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .loader-6 span::after {
+            -webkit-animation: loader-6-2 1.5s cubic-bezier(0.075, 0.820, 0.165, 1.000) .25s infinite;
+            animation: loader-6-2 1.5s cubic-bezier(0.075, 0.820, 0.165, 1.000) .25s infinite;
+        }
+
+        @-webkit-keyframes loader-6-2 {
+            0% {
+                -webkit-transform: translate3d(0, 0, 0) scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                -webkit-transform: translate3d(0, 0, 0) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes loader-6-2 {
+            0% {
+                transform: translate3d(0, 0, 0) scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate3d(0, 0, 0) scale(1);
+                opacity: 0;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+            border: 1px solid #00000000;
+        }
+
+        ::-webkit-scrollbar-track {
+            border-radius: 0;
+            background: #00000000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 0;
+            background: rgba(0, 0, 0, 0.308);
+        }
+    </style>
+
+    <!-- Halfmoon CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/css/halfmoon-variables.min.css" rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body data-dm-shortcut-enabled="true" data-set-preferred-mode-onload="true">
+    <div class="page-wrapper with-navbar">
+        <div class="sticky-alerts"></div>
+        <!-- Navbar start -->
+        <nav class="navbar">
+            <a href="#" class="navbar-brand ml-10 ml-sm-15">
+                <span class="badge font-size-18 text-monospace px-10 px-sm-14">Shortly</span>
+            </a>
+            <div class="navbar-content ml-auto">
+                <button class="btn btn-action mr-5" type="button" onclick="toggleDM()">
+                    <span id="darkModeIcon" class="material-icons">dark_mode</span>
+                </button>
+            </div>
+        </nav>
+        <!-- Navbar end -->
+
+        <!-- Content wrapper start -->
+        <div class="content-wrapper" style="text-align: center; margin-top: 180px;">
+            <input id="url" type="url" class="form-control form-control-lg" placeholder=" Paste URL here"
+                style="width: 70%; margin: auto; border-radius: 15px 50px 20px; padding: 20px;">
+
+            <!-- Input group with prepended switch -->
+            <div class="input-group" style="width: 50%; margin: auto; margin-top: 8px;">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <div class="custom-switch">
+                            <input type="checkbox" id="switch" value="">
+                            <label for="switch" class="blank"></label>
+                        </div>
+                    </div>
+                </div>
+                <input type="text" id="customSuffix" class="form-control" placeholder="Custom suffix" readonly
+                    style="border-radius: 0px 50px 20px 0px;">
+            </div>
+
+            <!-- loader -->
+            <div class="loader-6 center"><span></span></div>
+
+            <button id="shortenBtn" class="btn btn-rounded btn-primary" role="button" style="margin-top: 16px;"
+                onclick="getShortLink()">Shorten</button>
+
+            <div id="result"
+                style="width: 40%; border-radius: 14px; margin: auto; margin-top: 35px; padding: 3px 2px 3px 2px; display: none;">
+                <p>URL: </p>
+                <p id="mainUrl" class="text-monospace"
+                    style="white-space: nowrap; overflow: auto; margin-left: 10px; margin-right: 10px;"></p>
+                <p>Short link: </p>
+                <p id="resUrl" class="text-monospace"
+                    style="white-space: nowrap; overflow: auto; margin-left: 10px; margin-right: 10px;"></p>
+                <button class="btn" type="button" onclick="copyUrl()" style="margin-bottom: 8px;">Copy</button>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/js/halfmoon.min.js"></script>
+    <script>
+        function toastAlert(title, content) {
+            var alertContent = content;
+            halfmoon.initStickyAlert({
+                content: alertContent,
+                title: title
+            })
+        }
+    </script>
+    <script>
+        $(document).ready((e) => {
+            $("#darkModeIcon").html(halfmoon.darkModeOn ? "light_mode" : "dark_mode")
+            $("#result").css("background-color", halfmoon.darkModeOn ? "rgb(88, 1, 67)" : "rgb(228, 199, 220)")
+        });
+
+        const toggleDM = () => {
+            halfmoon.toggleDarkMode()
+            $("#darkModeIcon").html(halfmoon.darkModeOn ? "light_mode" : "dark_mode")
+            $("#result").css("background-color", halfmoon.darkModeOn ? "rgb(88, 1, 67)" : "rgb(228, 199, 220)")
+        }
+
+        let switchStatus = false;
+        $("#switch").on('change', () => {
+            if ($("#switch").is(':checked')) {
+                $("#customSuffix").removeAttr("readonly")
+                switchStatus = true
+            }
+            else {
+                $("#customSuffix").attr("readonly", "readonly")
+                switchStatus = false
+            }
+        });
+
+        const getShortLink = () => {
+            let url = $("#url").val()
+            if (!url) {
+                toastAlert("Invalid URL", "The URL cannot be empty")
+                return
+            }
+            let customSuffix = $("#customSuffix").val()
+            if (switchStatus && !customSuffix) {
+                toastAlert("Invalid suffix", "The suffix cannot be empty")
+                return
+            }
+            $(".loader-6").css("visibility", "visible")
+            let post_data = {
+                url: url,
+                customSuffix: customSuffix,
+                csrfmiddlewaretoken: '{{csrf_token}}'
+            }
+
+            const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+            $.ajax({
+                url: '/shorten',
+                type: 'POST',
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                data: post_data,
+                success: data => {
+                    $(".loader-6").css("visibility", "hidden")
+                    if (data['status']) {
+                        $("#mainUrl").html(data['url'])
+                        $("#resUrl").html(`${(window.location.href).replace(/(^\w+:|^)\/\//, '')}${data['res']}`)
+                        $("#result").css("display", "block")
+                        toastAlert("Success!", "The short link has been generated.")
+                    } else
+                        toastAlert("Server responded:", data['res'])
+                },
+                error: error => {
+                    $(".loader-6").css("visibility", "hidden")
+                    console.log(error)
+                    toastAlert("Oops!", "Something went wrong.")
+                }
+            });
+        }
+
+        const copyUrl = () => {
+            navigator.clipboard.writeText($("#resUrl").html())
+        }
+    </script>
+</body>
+
+</html>
